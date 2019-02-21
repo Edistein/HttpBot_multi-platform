@@ -1,0 +1,7 @@
+E:\Programming\Projects\Http.Console\Http.Console\bin\Release\Http.Console.exe.config
+E:\Programming\Projects\Http.Console\Http.Console\bin\Release\Http.Console.exe
+E:\Programming\Projects\Http.Console\Http.Console\bin\Release\Http.Console.pdb
+E:\Programming\Projects\Http.Console\Http.Console\obj\Release\Http.Console.csproj.CoreCompileInputs.cache
+E:\Programming\Projects\Http.Console\Http.Console\obj\Release\Http.Console.exe
+E:\Programming\Projects\Http.Console\Http.Console\obj\Release\Http.Console.pdb
+E:\Programming\Projects\Http.Console\Http.Console\obj\Release\Http.Console.csprojAssemblyReference.cache

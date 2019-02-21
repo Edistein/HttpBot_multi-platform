@@ -1,0 +1,7 @@
+E:\Programming\Projects\HttpBot\Http.Console\bin\x64\Release\Http.Console.exe.config
+E:\Programming\Projects\HttpBot\Http.Console\bin\x64\Release\Http.Console.exe
+E:\Programming\Projects\HttpBot\Http.Console\bin\x64\Release\Http.Console.pdb
+E:\Programming\Projects\HttpBot\Http.Console\obj\x64\Release\Http.Console.csprojAssemblyReference.cache
+E:\Programming\Projects\HttpBot\Http.Console\obj\x64\Release\Http.Console.csproj.CoreCompileInputs.cache
+E:\Programming\Projects\HttpBot\Http.Console\obj\x64\Release\Http.Console.exe
+E:\Programming\Projects\HttpBot\Http.Console\obj\x64\Release\Http.Console.pdb

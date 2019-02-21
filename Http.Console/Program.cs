@@ -109,6 +109,8 @@ namespace Http.Core
             string add = lxm.ReadIt(path, section, "addition");
             string num = lxm.ReadIt(path, section, "repeat");
             string encode = lxm.ReadIt(path, section, "encode");
+            string ck = lxm.ReadIt(path, section, "ck");
+            string ckName = lxm.ReadIt(path, section, "ckName");
 
 
             Console.WriteLine("当前配置    \n``````````````````````````````````");
@@ -119,7 +121,6 @@ namespace Http.Core
                 goto load;
             }
             int repeat = Convert.ToInt32(num);
-            if (num == "0735") { repeat = 0; }
             WebProxy proxy = new WebProxy("127.0.0.1", 8118);
             Console.WriteLine("按任意键开始...");
             Console.ReadKey();
@@ -146,19 +147,19 @@ namespace Http.Core
                 string ua = uaPool[ro.Next(0, 11)];
                 try
                 {
-                    http pack = new http(url, post, ip, ua, accept, ct, refer, proxy, px);
+                    http pack = new http(url, post, ip, ua, accept, ct, refer, proxy, px, ck, ckName);
 
 
                     if (reply)
                     {
                         Console.WriteLine("请求ID:" + process + "\n" + u + "\n" + p + "\n" + post + "\n--------------------------------");
-                        string re = pack.HttpPost(encode);
+                        string re = pack.HttpPost(encode,reply);
                         Console.WriteLine(re + "\n--------------------------------");
                     }
                     else
                     {
                         Console.WriteLine("请求ID:" + process + "\n" + u + "\n " + p + "\n " + post + "\n--------------------------------");
-                        pack.PostOnly(encode);
+                        pack.PostOnly(encode,reply);
                     }
                     int t = ro.Next(90, 7000);
                     if (sleep)
@@ -198,7 +199,7 @@ namespace Http.Core
                 {
                     DoEvents(i);
                 }
-                Console.WriteLine("Duration: " + sw.ElapsedMilliseconds + " ms");
+                Console.WriteLine("运行时间: " + sw.ElapsedMilliseconds + " ms");
             }
 
             Console.WriteLine("完成");
@@ -414,11 +415,11 @@ namespace Http.Core
     }
     public class http
     {
-        string Url, postDataStr, ip, ua, accept, ct, refer;
+        string Url, postDataStr, ip, ua, accept, ct, refer,ck,ckName;
         WebProxy proxy;
         bool px;
         #region 构造函数
-        public http(string Url, string postDataStr, string ip, string ua, string accept, string ct, string refer, WebProxy proxy, bool px)
+        public http(string Url, string postDataStr, string ip, string ua, string accept, string ct, string refer, WebProxy proxy, bool px,string ck, string ckName)
         {
             this.Url = Url;
             this.postDataStr = postDataStr;
@@ -429,19 +430,25 @@ namespace Http.Core
             this.refer = refer;
             this.proxy = proxy;
             this.px = px;
+            this.ck = ck;
+            this.ckName = ckName;
         }
         #endregion
-        public string HttpPost(string encode)
+        public string HttpPost(string encode, bool reply)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
-            /* Cookie cookie = new Cookie();
+             Cookie cookie = new Cookie();
              cookie.Name = this.ckName;
              cookie.Value = this.ck;
              cookie.Domain = this.Url.Substring(4);
              request.CookieContainer = new CookieContainer();
-             request.CookieContainer.Add(cookie);*/
+             request.CookieContainer.Add(cookie);
             request.Method = "POST";
             request.KeepAlive = true;
+            if (reply != true)
+            {
+                request.KeepAlive = false;
+            }
             request.ContentLength = postDataStr.Length;
             request.Accept = this.accept;
             request.UserAgent = this.ua;
@@ -454,32 +461,34 @@ namespace Http.Core
                 request.Proxy = proxy;
             }
             request.Referer = this.refer;
-            //request.ContentLength = Encoding.UTF8.GetByteCount(postDataStr);
             Stream myRequestStream = request.GetRequestStream();
             StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding(encode));
             myStreamWriter.Write(postDataStr);
             myStreamWriter.Close();
-
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             Stream myResponseStream = response.GetResponseStream();
-            StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding("gb2312"));
+            StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding(encode));
             string retString = myStreamReader.ReadToEnd();
             myStreamReader.Close();
             myResponseStream.Close();
 
             return retString;
         }
-        public void PostOnly(string encode)
+        public void PostOnly(string encode,bool reply)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
-            /*Cookie cookie = new Cookie();
+            Cookie cookie = new Cookie();
             cookie.Name = this.ckName;
             cookie.Value = this.ck;
-            cookie.Domain = this.Url.Substring(4);
+            cookie.Domain = this.Url.Substring(7);
             request.CookieContainer = new CookieContainer();
-            request.CookieContainer.Add(cookie);*/
+            request.CookieContainer.Add(cookie);
             request.Method = "POST";
             request.KeepAlive = true;
+            if (reply!=true)
+            {
+                request.KeepAlive = false;
+            }
             request.ContentLength = postDataStr.Length;
             request.Accept = this.accept;
             request.UserAgent = this.ua;
