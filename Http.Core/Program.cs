@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.IO;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Http.Core
 {
@@ -27,148 +27,115 @@ namespace Http.Core
         #endregion
         static void Main(string[] args)
         {
+            Console.WriteLine("== Welcome to VictimSimulator v1.1 ==");
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            load:
-            Console.WriteLine("输入预设名：(直接回车使用默认值)");
-            string section = Console.ReadLine().ToString();
-            if (section == "")
+        load:
+            Console.WriteLine("Input the preset file name:  ");
+            string name = Console.ReadLine().ToString();
+            if (name == "")
             {
-                section = "Default";
+                name = "Default";
             }
-            bool px = false; bool threads = false; bool sleep = false; bool reply = true; bool strong = false; bool email = false; 
-            string pxStatus = "关闭", threadsStatus = "关闭", sleepStatus = "关闭", strongStatus = "关闭", emailStatus = "关闭", replyStatus = "关闭";
-            string path = ".\\console.ini";
-            Console.WriteLine("尝试读取"+section+"的内容");
+            string path = ".\\"+name+".json";
+            Console.WriteLine("Reading setting from "+name+".json...");
             #region 配置读取
-            fuckxml lxm = new fuckxml();
-            if (lxm.ReadIt(path, section, "proxy") == "true")
+            string json = "";
+            try
             {
-                px = true;
-                pxStatus = "开启";
+                StreamReader srReadFile = new StreamReader(path);
+                while (!srReadFile.EndOfStream)
+                 {
+                    json += srReadFile.ReadLine();
+                 }
             }
-            else if ((lxm.ReadIt(path, section, "proxy") == "false"))
+            catch (SystemException e)
             {
-                px = false;
-                pxStatus = "关闭";
-            }
-            if (lxm.ReadIt(path, section, "threads") == "true")
-            {
-                threads = true;
-                threadsStatus = " 开启";
-            }
-            else if ((lxm.ReadIt(path, section, "threads") == "false"))
-            {
-                threads = false;
-                threadsStatus = "关闭";
-            }
-            if (lxm.ReadIt(path, section, "sleep") == "true")
-            {
-                sleep = true;
-                sleepStatus = "开启";
-            }
-            else if ((lxm.ReadIt(path, section, "sleep") == "false"))
-            {
-                sleep = false;
-                sleepStatus = "关闭";
-            }
-            if (lxm.ReadIt(path, section, "reply") == "true")
-            {
-                reply = true;
-                replyStatus = "关闭";
-            }
-            else if ((lxm.ReadIt(path, section, "reply") == "false"))
-            {
-                reply = false;
-                replyStatus = "打开";
-            }
-            if (lxm.ReadIt(path, section, "strong") == "true")
-            {
-                strong = true;
-                strongStatus = "打开";
-            }
-            else if ((lxm.ReadIt(path, section, "strong") == "false"))
-            {
-                strong = false;
-                strongStatus = "关闭";
-            }
-            if (lxm.ReadIt(path, section, "email") == "true")
-            {
-                email = true;
-                emailStatus = "打开";
-            }
-            else if ((lxm.ReadIt(path, section, "email") == "false"))
-            {
-                email = false;
-                emailStatus = "关闭";
-            }
-            string url = lxm.ReadIt(path, section, "url");
-            string uname = lxm.ReadIt(path, section, "user");
-            string pname = lxm.ReadIt(path, section, "password");
-            string accept = lxm.ReadIt(path, section, "accept");
-            string ct = lxm.ReadIt(path, section, "ct");
-            string refer = lxm.ReadIt(path, section, "refer");
-            string ck = null;
-            string add = lxm.ReadIt(path, section, "addition");
-            string num = lxm.ReadIt(path, section, "repeat");
-            string encode = lxm.ReadIt(path, section, "encode");
-
-
-            Console.WriteLine("当前配置    \n``````````````````````````````````");
-            Console.WriteLine("编码集："+encode+"\nURL：" + url + "\n用户变量：" + uname + "\n密码变量：" + pname + "\n额外参数：" + add + "\n重复次数：" + num + "\n\n代理模式：" + pxStatus + "\n并发模式：" + threadsStatus + "\n睡眠模式：" + sleepStatus + "\n\n邮箱模式：" + emailStatus + "\n强密码模式：" + strongStatus + "\n\n渣男模式：" + replyStatus+"\n");
-            if (url == "Error"|encode=="Error"| uname == "Error" | pname == "Error" | num == "Error")
-            {
-                Console.WriteLine("\n-------------------------------------------------\n未能成功加载指定内容，检查配置文件和预设名\n=================================================\n");
+                Console.WriteLine(e.Message);
                 goto load;
             }
-            int repeat = Convert.ToInt32(num);
-            WebProxy proxy = new WebProxy("127.0.0.1", 8118);
-            Console.WriteLine("按任意键开始...");
+            Console.WriteLine("File content: "+json);
+            preset p0;
+            p0 = JsonConvert.DeserializeObject<preset>(json);
+            try
+            {
+                
+            }
+            catch 
+            {
+                Console.WriteLine("File Error. ");
+                goto load;
+            }
+            Console.WriteLine("Successfully loaded.\n---------------------");
+            Console.WriteLine("Current Setting    \n---------------------");
+            Console.WriteLine("Charset= " + p0.encode + "\nURL：" +p0. url + "\nUserV= " +p0. user + "\nPasswordV= " + p0.password + "\nAdditionalV= " + p0.addition + "\nRepeat= " + p0.repeat +  "\nThreads= " + p0.threads + "\nSleepMode= " + p0.sleep + "\n*\nEmailMode= " + p0.email + "\nStrongPwMode= " + p0.strong + "\n*\nNoreply= " + p0.noreply + "\n");
+            int repeat = Convert.ToInt32(p0.repeat);
+            bool threads = false;bool noreply = false;bool strong = false; bool email = false;bool sleep = false;
+            if (p0.threads == "true")
+            {
+                threads = true;
+            }
+            if (p0.noreply == "true")
+            {
+                noreply = true;
+            }
+            if (p0.strong == "true")
+            {
+                strong = true;
+            }
+            if (p0.email == "true")
+            {
+                email = true;
+            }
+            if (p0.sleep == "true")
+            {
+                sleep = true;
+            }
+            Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
-            #endregion
+#endregion
             #region 干活
             void DoEvents(int process)
             {
-                Random ro = new Random();
+                Random ro = new Random(GetRandomSeed());
                 string u, p;
                 if (email)
                 {
-                    u = GetUs(ro,1);
+                    u = GetUs(ro, 1);
                 }
                 else
                 {
                     u = GetUs(ro, 0);
                 }
 
-                if (strong) { p = GetPw(ro, 1); } else {p = GetPw(ro,0); }
-                /*u = Uri.EscapeDataString(u);
-                p = Uri.EscapeDataString(p);*/
+                if (strong) { p = GetPw(ro, 1); } else { p = GetPw(ro, 0); }
+                u = Uri.EscapeDataString(u);
+                p = Uri.EscapeDataString(p);
                 string ip = Convert.ToString(ro.Next(1, 255)) + "." + Convert.ToString(ro.Next(1, 255)) + "." + Convert.ToString(ro.Next(1, 255)) + "." + Convert.ToString(ro.Next(1, 255));
-                string post = uname + "=" + u + "&" + pname + "=" + p + add;
-                post = Uri.EscapeDataString(post);
+                string post = p0.user + "=" + u + "&" + p0.password + "=" + p + p0.addition;
                 string ua = uaPool[ro.Next(0, 11)];
                 try
                 {
-                    http pack = new http(url, post, ip, ua, accept, ct, refer, ck, proxy, px);
-                    
-                    
-                    if (reply)
+                    http pack = new http(p0, post, ip, ua);
+
+
+                    if (noreply==false)
                     {
-                        Console.WriteLine("请求ID:" + process + "\n" + u + "\n" + p + "\n" + post + "\n--------------------------------");
-                        string re = pack.HttpPost(encode);
+                        Console.WriteLine("ID:" + process + "\n" + u + "\n" + p + "\n" + post + "\n--------------------------------");
+                        string re = pack.HttpPost(p0.encode, noreply);
                         Console.WriteLine(re + "\n--------------------------------");
                     }
                     else
                     {
-                        Console.WriteLine("请求ID:" + process + "\n" + u + "\n " + p + "\n " + post + "\n--------------------------------");
-                        pack.PostOnly(encode);
+                        Console.WriteLine("ID:" + process + "\n" + u + "\n " + p + "\n " + post + "\n--------------------------------");
+                        pack.PostOnly(p0.encode, noreply);
                     }
                     int t = ro.Next(90, 7000);
                     if (sleep)
                     {
                         for (int j = 0; j <= t; j++)
                         {
-                            
-                            Console.WriteLine("请求ID:"+process+"  已挂起" + j + "/" + t + "秒");
+
+                            Console.WriteLine("ID:" + process + "  Sleeping...   " + j + "/" + t + " s");
                             Thread.Sleep(1000);
                             ClearLine();
                         }
@@ -177,7 +144,7 @@ namespace Http.Core
                 }
                 catch (SystemException e)
                 {
-                    Console.WriteLine("请求ID:" + process +"   -->   "+ e.Message);
+                    Console.WriteLine("ID:" + process + "   -->   " + e.Message);
                 }
             }
             #endregion
@@ -185,7 +152,7 @@ namespace Http.Core
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                Parallel.For(0, repeat, i =>
+                Parallel.For(1, repeat, i =>
                 {
                     DoEvents(i);
                 });
@@ -200,10 +167,10 @@ namespace Http.Core
                 {
                     DoEvents(i);
                 }
-                Console.WriteLine("Duration: " + sw.ElapsedMilliseconds+" ms");
+                Console.WriteLine("Duration: " + sw.ElapsedMilliseconds + " ms");
             }
 
-            Console.WriteLine("完成");
+            Console.WriteLine("Done. ");
             Console.ReadKey();
 
         }
@@ -222,8 +189,8 @@ namespace Http.Core
         }
         static public string GetUs(Random ro, int cases)
         {
-            string u="";
-            
+            string u = "";
+
             if (cases == 0)
             {
                 u = Convert.ToString(ro.Next(100000000, 999999999));
@@ -264,7 +231,7 @@ namespace Http.Core
         static public string GetPw(Random ro, int cases)
         {
             int mode = ro.Next(0, 23);
-            if (cases==1)  //Strong passwords
+            if (cases == 1)  //Strong passwords
             {
                 mode = ro.Next(16, 23);
             }
@@ -416,35 +383,29 @@ namespace Http.Core
     }
     public class http
     {
-        string Url, postDataStr, ip, ua, accept, ct, refer, ck;
-        WebProxy proxy;
-        bool px;
+        string Url, postDataStr, ip, ua, accept, ct, refer;
         #region 构造函数
-        public http(string Url, string postDataStr, string ip, string ua, string accept, string ct, string refer, string ck,  WebProxy proxy, bool px)
+        public http(preset p, string postDataStr, string ip, string ua)
         {
-            this.Url = Url;
+            this.Url = p.url;
             this.postDataStr = postDataStr;
             this.ip = ip;
             this.ua = ua;
-            this.accept = accept;
-            this.ct = ct;
-            this.refer = refer;
-            this.ck = ck;
-            this.proxy = proxy;
-            this.px = px;
+            this.accept = p.accept;
+            this.ct = p.ct;
+            this.refer =p. refer;
         }
         #endregion
-        public string HttpPost(string encode)
+        public string HttpPost(string encode, bool noreply)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
-           /* Cookie cookie = new Cookie();
-            cookie.Name = this.ckName;
-            cookie.Value = this.ck;
-            cookie.Domain = this.Url.Substring(4);
             request.CookieContainer = new CookieContainer();
-            request.CookieContainer.Add(cookie);*/
             request.Method = "POST";
             request.KeepAlive = true;
+            if (noreply == true)
+            {
+                request.KeepAlive = false;
+            }
             request.ContentLength = postDataStr.Length;
             request.Accept = this.accept;
             request.UserAgent = this.ua;
@@ -452,37 +413,29 @@ namespace Http.Core
             request.Referer = refer;
             request.Headers.Add("X_FORWARDED_FOR", this.ip);
             request.Headers.Add("CLIENT_IP", this.ip);
-            if (this.px)
-            {
-                request.Proxy = proxy;
-            }
             request.Referer = this.refer;
-            //request.ContentLength = Encoding.UTF8.GetByteCount(postDataStr);
             Stream myRequestStream = request.GetRequestStream();
             StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding(encode));
             myStreamWriter.Write(postDataStr);
             myStreamWriter.Close();
-
             HttpWebResponse response = (HttpWebResponse)request.GetResponse();
             Stream myResponseStream = response.GetResponseStream();
-            StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding("gb2312"));
+            StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding(encode));
             string retString = myStreamReader.ReadToEnd();
             myStreamReader.Close();
             myResponseStream.Close();
 
             return retString;
         }
-        public void PostOnly(string encode)
+        public void PostOnly(string encode, bool noreply)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(Url);
-            /*Cookie cookie = new Cookie();
-            cookie.Name = this.ckName;
-            cookie.Value = this.ck;
-            cookie.Domain = this.Url.Substring(4);
-            request.CookieContainer = new CookieContainer();
-            request.CookieContainer.Add(cookie);*/
             request.Method = "POST";
             request.KeepAlive = true;
+            if (noreply == true)
+            {
+                request.KeepAlive = false;
+            }
             request.ContentLength = postDataStr.Length;
             request.Accept = this.accept;
             request.UserAgent = this.ua;
@@ -490,35 +443,33 @@ namespace Http.Core
             request.Referer = refer;
             request.Headers.Add("X_FORWARDED_FOR", this.ip);
             request.Headers.Add("CLIENT_IP", this.ip);
-            if (this.px)
-            {
-                request.Proxy = proxy;
-            }
             request.Referer = this.refer;
             request.ContentLength = Encoding.UTF8.GetByteCount(postDataStr);
             Stream myRequestStream = request.GetRequestStream();
-           StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding(encode));
+            StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding(encode));
             myStreamWriter.Write(postDataStr);
             myStreamWriter.Close();
         }
     }
-    public class fuckxml
+    public class preset
     {
-        [DllImport("kernel32")]
-        private static extern long WritePrivateProfileString(string section, string key,
-                                                             string val, string filePath);
-
-        [DllImport("kernel32")]
-        private static extern int GetPrivateProfileString(string section, string key,
-                                                           string def, StringBuilder retVal,
-                                                           int size, string filePath);
-
-        public string ReadIt(string path, string section, string key)
+        public string encode, url, user, password, accept, ct, refer, addition, repeat, email, strong, threads, noreply,sleep;
+        public preset(string encode, string url, string user, string password, string accept, string ct, string refer, string ck, string addition, string repeat, string email, string threads, string noreply,string sleep, string strong)
         {
-            StringBuilder temp = new StringBuilder(255);
-            int i = GetPrivateProfileString(section, key, "Error", temp, 255, path);
-            int jj = temp.Length;
-            return temp.ToString();
+            this.encode = encode;
+            this.url = url;
+            this.user = user;
+            this.password = password;
+            this.accept = accept;
+            this.ct = ct;
+            this.refer = refer;
+            this.addition = addition;
+            this.repeat = repeat;
+            this.email = email;
+            this.threads = threads;
+            this.noreply = noreply;
+            this.sleep = sleep;
+            this.strong = strong;
         }
     }
 }
